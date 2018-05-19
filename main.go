@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/prometheus/common/log"
 )
 
 var (
-	REPO       = "toshi0607/gig"
+	REPO       = os.Getenv("REPO")
 	REPO_URL   = "https://github.com/" + REPO
 	LATEST_URL = REPO_URL + "/releases/latest"
 
