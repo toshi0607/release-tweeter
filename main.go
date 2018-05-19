@@ -1,16 +1,25 @@
 package main
 
 import (
-	"github.com/aws/aws-lambda-go/lambda"
-	"net/http"
-	"github.com/prometheus/common/log"
 	"fmt"
+	"net/http"
+	"os"
 	"strings"
+
+	"github.com/ChimeraCoder/anaconda"
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/prometheus/common/log"
 )
 
 var (
-	REPO = "toshi0607/gig"
-	LATEST_URL = "https://github.com/" + REPO + "/releases/latest"
+	REPO       = "toshi0607/gig"
+	REPO_URL   = "https://github.com/" + REPO
+	LATEST_URL = REPO_URL + "/releases/latest"
+
+	TWITTER_ACCESS_TOKEN        = os.Getenv("TWITTER_ACCESS_TOKEN")
+	TWITTER_ACCESS_TOKEN_SECRET = os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
+	TWITTER_CONSUMER_KEY        = os.Getenv("TWITTER_CONSUMER_KEY")
+	TWITTER_CONSUMER_SECRET     = os.Getenv("TWITTER_CONSUMER_SECRET")
 )
 
 func main() {
@@ -30,7 +39,19 @@ func Handler() {
 	}
 	defer resp.Body.Close()
 
-	fmt.Println(getLatestTag(resp.Request.URL.Path))
+	tag := getLatestTag(resp.Request.URL.Path)
+
+	api := anaconda.NewTwitterApiWithCredentials(
+		TWITTER_ACCESS_TOKEN,
+		TWITTER_ACCESS_TOKEN_SECRET,
+		TWITTER_CONSUMER_KEY,
+		TWITTER_CONSUMER_SECRET,
+	)
+	message := fmt.Sprintf("%s %s released! check the new features on GitHub.\n%s", REPO, tag, REPO_URL)
+	_, err = api.PostTweet(message, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func getLatestTag(url string) string {
