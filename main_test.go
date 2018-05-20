@@ -8,7 +8,7 @@ import (
 )
 
 func TestHandler(t *testing.T) {
-	postTweet = func(api a.TwitterApi) postTweetFunc {
+	postTweetFunc = func(api a.TwitterApi) postTweet {
 		return postTweetHelper
 	}
 	Handler()
