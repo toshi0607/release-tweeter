@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 
@@ -17,16 +16,28 @@ var (
 	REPO_URL   = "https://github.com/" + REPO
 	LATEST_URL = REPO_URL + "/releases/latest"
 
-	TWITTER_ACCESS_TOKEN        = os.Getenv("TWITTER_ACCESS_TOKEN")
-	TWITTER_ACCESS_TOKEN_SECRET = os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
-	TWITTER_CONSUMER_KEY        = os.Getenv("TWITTER_CONSUMER_KEY")
-	TWITTER_CONSUMER_SECRET     = os.Getenv("TWITTER_CONSUMER_SECRET")
-	postTweetFunc               = func(api a.TwitterApi) postTweet {
-		return api.PostTweet
-	}
+	TWITTER_ACCESS_TOKEN                = os.Getenv("TWITTER_ACCESS_TOKEN")
+	TWITTER_ACCESS_TOKEN_SECRET         = os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
+	TWITTER_CONSUMER_KEY                = os.Getenv("TWITTER_CONSUMER_KEY")
+	TWITTER_CONSUMER_SECRET             = os.Getenv("TWITTER_CONSUMER_SECRET")
+	twitterClient               tweeter = api(*a.NewTwitterApiWithCredentials(
+		TWITTER_ACCESS_TOKEN,
+		TWITTER_ACCESS_TOKEN_SECRET,
+		TWITTER_CONSUMER_KEY,
+		TWITTER_CONSUMER_SECRET,
+	))
 )
 
-type postTweet func(status string, v url.Values) (tweet a.Tweet, err error)
+type tweeter interface {
+	tweet(message string) (string, error)
+}
+
+type api a.TwitterApi
+
+func (api api) tweet(message string) (string, error) {
+	tweet, err := (a.TwitterApi(api)).PostTweet(message, nil)
+	return tweet.Text, err
+}
 
 func main() {
 	lambda.Start(Handler)
@@ -47,16 +58,10 @@ func Handler() {
 
 	tag := getLatestTag(resp.Request.URL.Path)
 
-	api := a.NewTwitterApiWithCredentials(
-		TWITTER_ACCESS_TOKEN,
-		TWITTER_ACCESS_TOKEN_SECRET,
-		TWITTER_CONSUMER_KEY,
-		TWITTER_CONSUMER_SECRET,
-	)
 	message := fmt.Sprintf("%s %s released! check the new features on GitHub.\n%s", REPO, tag, REPO_URL)
-	tweet, err := postTweetFunc(*api)(message, nil)
-	if !strings.Contains(tweet.Text, tag) {
-		log.Fatalf("faile to tweet: %s", tweet.Text)
+	msg, err := twitterClient.tweet(message)
+	if !strings.Contains(msg, tag) {
+		log.Fatalf("failed to tweet: %s", msg)
 	}
 	if err != nil {
 		log.Fatal(err)
