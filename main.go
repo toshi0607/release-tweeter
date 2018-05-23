@@ -8,7 +8,9 @@ import (
 	"strings"
 
 	a "github.com/ChimeraCoder/anaconda"
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -43,29 +45,58 @@ func main() {
 	lambda.Start(Handler)
 }
 
-func Handler() {
+func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	if hasEmptyEnvVar() {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+		}, errors.New("Env Vars not set")
+	}
+
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", LATEST_URL, nil)
 	if err != nil {
-		log.Fatal(err)
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+		}, err
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+		}, err
 	}
 	defer resp.Body.Close()
 
 	tag := getLatestTag(resp.Request.URL.Path)
+	log.Printf("tag: %s, ID: %s\n", tag, request.RequestContext.RequestID)
 
 	message := fmt.Sprintf("%s %s released! check the new features on GitHub.\n%s", REPO, tag, REPO_URL)
 	msg, err := twitterClient.tweet(message)
-	if !strings.Contains(msg, tag) {
-		log.Fatalf("failed to tweet: %s", msg)
-	}
 	if err != nil {
-		log.Fatal(err)
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+		}, err
 	}
+	if !strings.Contains(msg, tag) {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+		}, errors.New("failed to tweet: " + msg)
+	}
+	log.Printf("message tweeted: %s, ID: %s\n", msg, request.RequestContext.RequestID)
+
+	return events.APIGatewayProxyResponse{
+		Body:       tag,
+		StatusCode: http.StatusOK,
+	}, nil
+}
+
+func hasEmptyEnvVar() bool {
+	return TWITTER_ACCESS_TOKEN == "" ||
+		TWITTER_ACCESS_TOKEN_SECRET == "" ||
+		TWITTER_CONSUMER_KEY == "" ||
+		TWITTER_CONSUMER_SECRET == "" ||
+		REPO == ""
 }
 
 func getLatestTag(url string) string {

@@ -2,11 +2,13 @@ package main
 
 import (
 	"testing"
+
+	"github.com/aws/aws-lambda-go/events"
 )
 
 func TestHandler(t *testing.T) {
 	prepare()
-	Handler()
+	Handler(events.APIGatewayProxyRequest{})
 }
 
 func prepare() {
