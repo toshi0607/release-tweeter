@@ -13,3 +13,6 @@
 
 # IDE
 .idea/
+
+# aws-sam-local
+env.json

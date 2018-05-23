@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  ReleaseTweeter:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: main
+      Runtime: go1.x
+      Tracing: Active
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: post
+      Environment:
+        Variables:
+          TWITTER_ACCESS_TOKEN:
+          TWITTER_ACCESS_TOKEN_SECRET:
+          TWITTER_CONSUMER_KEY:
+          TWITTER_CONSUMER_SECRET:
+          REPO:
