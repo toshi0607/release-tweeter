@@ -1,0 +1,19 @@
+language: go
+
+sudo: false
+
+go:
+  - 1.10
+
+os:
+  - osx
+
+before_install:
+  - go get -u github.com/golang/dep/cmd/dep
+  - dep ensure
+
+script:
+  - make test-all
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

@@ -1,0 +1,9 @@
+{
+  "ReleaseTweeter": {
+    "TWITTER_ACCESS_TOKEN": "your token",
+    "TWITTER_ACCESS_TOKEN_SECRET": "your secret",
+    "TWITTER_CONSUMER_KEY": "your key",
+    "TWITTER_CONSUMER_SECRET": "your secret",
+    "REPO": "[your GitHub repository like toshi0607/gig]"
+  }
+}

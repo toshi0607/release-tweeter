@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -8,7 +9,18 @@ import (
 
 func TestHandler(t *testing.T) {
 	prepare()
-	Handler(events.APIGatewayProxyRequest{})
+
+	res, err := handler(events.APIGatewayProxyRequest{
+		HTTPMethod: "POST",
+	})
+
+	if err != nil {
+		t.Errorf("got an error %v, want nothing happened", err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		t.Errorf("ExitStatus=%d, want %d", res.StatusCode, http.StatusOK)
+	}
 }
 
 func prepare() {

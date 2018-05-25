@@ -14,19 +14,19 @@ import (
 )
 
 var (
-	REPO       = os.Getenv("REPO")
-	REPO_URL   = "https://github.com/" + REPO
-	LATEST_URL = REPO_URL + "/releases/latest"
+	repo      = os.Getenv("REPO")
+	repoURL   = "https://github.com/" + repo
+	latestURL = repoURL + "/releases/latest"
 
-	TWITTER_ACCESS_TOKEN                = os.Getenv("TWITTER_ACCESS_TOKEN")
-	TWITTER_ACCESS_TOKEN_SECRET         = os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
-	TWITTER_CONSUMER_KEY                = os.Getenv("TWITTER_CONSUMER_KEY")
-	TWITTER_CONSUMER_SECRET             = os.Getenv("TWITTER_CONSUMER_SECRET")
-	twitterClient               tweeter = api(*a.NewTwitterApiWithCredentials(
-		TWITTER_ACCESS_TOKEN,
-		TWITTER_ACCESS_TOKEN_SECRET,
-		TWITTER_CONSUMER_KEY,
-		TWITTER_CONSUMER_SECRET,
+	twitterAccessToken               = os.Getenv("TWITTER_ACCESS_TOKEN")
+	twitterAccessTokenSecret         = os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
+	twitterConsumerKey               = os.Getenv("TWITTER_CONSUMER_KEY")
+	twitterConsumerKeySecret         = os.Getenv("TWITTER_CONSUMER_SECRET")
+	twitterClient            tweeter = api(*a.NewTwitterApiWithCredentials(
+		twitterAccessToken,
+		twitterAccessTokenSecret,
+		twitterConsumerKey,
+		twitterConsumerKeySecret,
 	))
 )
 
@@ -42,10 +42,16 @@ func (api api) tweet(message string) (string, error) {
 }
 
 func main() {
-	lambda.Start(Handler)
+	lambda.Start(handler)
 }
 
-func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	if request.HTTPMethod != "POST" {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusBadRequest,
+		}, errors.New("use POST request")
+	}
+
 	if hasEmptyEnvVar() {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
@@ -53,7 +59,7 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}
 
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", LATEST_URL, nil)
+	req, err := http.NewRequest("GET", latestURL, nil)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
@@ -68,10 +74,15 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}
 	defer resp.Body.Close()
 
-	tag := getLatestTag(resp.Request.URL.Path)
+	tag, err := getLatestTag(resp.Request.URL.Path)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusNotFound,
+		}, err
+	}
 	log.Printf("tag: %s, ID: %s\n", tag, request.RequestContext.RequestID)
 
-	message := fmt.Sprintf("%s %s released! check the new features on GitHub.\n%s", REPO, tag, REPO_URL)
+	message := fmt.Sprintf("%s %s released! check the new features on GitHub.\n%s", repo, tag, repoURL)
 	msg, err := twitterClient.tweet(message)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
@@ -92,14 +103,17 @@ func Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 }
 
 func hasEmptyEnvVar() bool {
-	return TWITTER_ACCESS_TOKEN == "" ||
-		TWITTER_ACCESS_TOKEN_SECRET == "" ||
-		TWITTER_CONSUMER_KEY == "" ||
-		TWITTER_CONSUMER_SECRET == "" ||
-		REPO == ""
+	return twitterAccessToken == "" ||
+		twitterAccessTokenSecret == "" ||
+		twitterConsumerKey == "" ||
+		twitterConsumerKeySecret == "" ||
+		repo == ""
 }
 
-func getLatestTag(url string) string {
+func getLatestTag(url string) (string, error) {
 	s := strings.Split(url, "/")
-	return s[len(s)-1]
+	if !strings.Contains(url, "v") {
+		return "", errors.Errorf("%s has no tag", repo)
+	}
+	return s[len(s)-1], nil
 }
