@@ -1,5 +1,18 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
+Description: Notifier with API Gateway & Lambda
+Parameters:
+  TwitterAccessToken:
+    Type : String
+  TwitterAccessTokenSecret:
+    Type : String
+  TwitterConsumerKey:
+    Type : String
+  TwitterConsumerSecret:
+    Type : String
+  Repo:
+    Type : String
+    Description: from GitHub e.g. toshi0607/gig
 Resources:
   ReleaseTweeter:
     Type: AWS::Serverless::Function
@@ -15,8 +28,8 @@ Resources:
             Method: post
       Environment:
         Variables:
-          TWITTER_ACCESS_TOKEN:
-          TWITTER_ACCESS_TOKEN_SECRET:
-          TWITTER_CONSUMER_KEY:
-          TWITTER_CONSUMER_SECRET:
-          REPO:
+          TWITTER_ACCESS_TOKEN: !Ref TwitterAccessToken
+          TWITTER_ACCESS_TOKEN_SECRET: !Ref TwitterAccessTokenSecret
+          TWITTER_CONSUMER_KEY: !Ref TwitterConsumerKey
+          TWITTER_CONSUMER_SECRET: !Ref TwitterConsumerSecret
+          REPO: !Ref Repo

@@ -14,5 +14,7 @@
 # IDE
 .idea/
 
-# aws-sam-local
+# aws
+credentials.csv
 env.json
+packaged.yaml
