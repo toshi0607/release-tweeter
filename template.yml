@@ -10,9 +10,6 @@ Parameters:
     Type : String
   TwitterConsumerSecret:
     Type : String
-  Repo:
-    Type : String
-    Description: from GitHub e.g. toshi0607/gig
 Resources:
   ReleaseTweeter:
     Type: AWS::Serverless::Function
@@ -32,4 +29,3 @@ Resources:
           TWITTER_ACCESS_TOKEN_SECRET: !Ref TwitterAccessTokenSecret
           TWITTER_CONSUMER_KEY: !Ref TwitterConsumerKey
           TWITTER_CONSUMER_SECRET: !Ref TwitterConsumerSecret
-          REPO: !Ref Repo

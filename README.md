@@ -20,7 +20,6 @@ You can test AWS Lambda & API Gateway locally with [AWS SAM (Serverless Applicat
 * install [aws-sam-cli](https://github.com/awslabs/aws-sam-cli). Docker is also required. Follow the instruction [here](https://github.com/awslabs/aws-sam-cli#installation).
 * set environment variables to [sample-env.json](sample-env.json).
   * You have to go to the [Twitter Apps page](https://apps.twitter.com/) and create new app by yourself. Then you can get *Access Token*, *Access Token Secret*, *Consumer Key (API Key)* and *Consumer Secret (API Secret)*.
-  * *REPO* is your repository name on the GitHub. For example, if you want to notice the latest release on [this repository](https://github.com/toshi0607/gig) to your followers, you have to set **toshi0607/gig** to *REPO*.
 
 ### hosting
 
@@ -43,7 +42,7 @@ SAM CLI if you update your AWS SAM template.
 
 
 # request to the localhost from another tab
-$ curl -XPOST http://127.0.0.1:3000/
+$ curl -X POST -d '{"owner": "toshi0607", "repo": "gig"}' http://127.0.0.1:3000/
 v0.1.4 # and post twitter account's timeline
 ```
 
@@ -153,7 +152,7 @@ $ sam deploy --profile private \
   --template-file ./packaged.yml \
   --stack-name stack-release-tweeter \
   --capabilities CAPABILITY_IAM \
-  --parameter-overrides REPO=$REPO \
+  --parameter-overrides \
     TWITTER_ACCESS_TOKEN=$TWITTER_ACCESS_TOKEN \
     TWITTER_ACCESS_TOKEN_SECRET=$TWITTER_ACCESS_TOKEN_SECRET \
     TWITTER_CONSUMER_KEY=$TWITTER_CONSUMER_KEY \
@@ -161,5 +160,5 @@ $ sam deploy --profile private \
 ```
 
 * *--parameter-overrides* option is requred because we shouldn't write qredentials to the *template.yml*.
-* you have to set 5 environment variables in this case. you can pass value of *REPO*, *TWITTER_ACCESS_TOKEN*, *TWITTER_ACCESS_TOKEN_SECRET*, *TWITTER_CONSUMER_KEY* and *TWITTER_CONSUMER_SECRET* directly instead.
+* you have to set 5 environment variables in this case. you can pass value of *TWITTER_ACCESS_TOKEN*, *TWITTER_ACCESS_TOKEN_SECRET*, *TWITTER_CONSUMER_KEY* and *TWITTER_CONSUMER_SECRET* directly instead.
 * a stack name (`stack-release-tweeter` in this case) should be unique globally.

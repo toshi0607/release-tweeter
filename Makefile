@@ -48,4 +48,7 @@ build:
 local: build
 	sam local start-api --env-vars env.json
 
+post:
+	curl -X POST -d '{"owner": "toshi0607", "repo": "gig"}' http://127.0.0.1:3000/
+
 .PHONY: test-all test vet lint setup bump upload build deploy release local

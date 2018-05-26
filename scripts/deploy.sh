@@ -10,7 +10,7 @@ sam deploy --profile private \
   --template-file ./packaged.yml \
   --stack-name stack-release-tweeter \
   --capabilities CAPABILITY_IAM \
-  --parameter-overrides REPO=toshi0607/release-tweeter \
+  --parameter-overrides \
     TWITTER_ACCESS_TOKEN=${TWITTER_ACCESS_TOKEN} \
     TWITTER_ACCESS_TOKEN_SECRET=${TWITTER_ACCESS_TOKEN_SECRET} \
     TWITTER_CONSUMER_KEY=${TWITTER_CONSUMER_KEY} \
