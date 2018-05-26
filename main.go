@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,10 +14,6 @@ import (
 )
 
 var (
-	repo      = os.Getenv("REPO")
-	repoURL   = "https://github.com/" + repo
-	latestURL = repoURL + "/releases/latest"
-
 	twitterAccessToken               = os.Getenv("TWITTER_ACCESS_TOKEN")
 	twitterAccessTokenSecret         = os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
 	twitterConsumerKey               = os.Getenv("TWITTER_CONSUMER_KEY")
@@ -40,6 +37,11 @@ func (api api) tweet(message string) (string, error) {
 	return tweet.Text, err
 }
 
+type params struct {
+	Owner string `json:"owner"`
+	Repo  string `json:"repo"`
+}
+
 func main() {
 	lambda.Start(handler)
 }
@@ -52,6 +54,10 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		), nil
 	}
 
+	var p params
+	json.Unmarshal([]byte(request.Body), &p)
+	repo := p.Owner + "/" + p.Repo
+
 	if hasEmptyEnvVar() {
 		return response(
 			http.StatusInternalServerError,
@@ -60,6 +66,8 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}
 
 	client := &http.Client{}
+	repoURL := "https://github.com/" + repo
+	latestURL := repoURL + "/releases/latest"
 	req, err := http.NewRequest("GET", latestURL, nil)
 	if err != nil {
 		return response(
@@ -109,14 +117,13 @@ func hasEmptyEnvVar() bool {
 	return twitterAccessToken == "" ||
 		twitterAccessTokenSecret == "" ||
 		twitterConsumerKey == "" ||
-		twitterConsumerKeySecret == "" ||
-		repo == ""
+		twitterConsumerKeySecret == ""
 }
 
 func getLatestTag(url string) (string, error) {
 	s := strings.Split(url, "/")
 	if !strings.Contains(url, "v") {
-		return "", fmt.Errorf("%s has no tag", repo)
+		return "", fmt.Errorf("has no tag")
 	}
 	return s[len(s)-1], nil
 }
