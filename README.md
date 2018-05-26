@@ -12,8 +12,8 @@ You can test AWS Lambda & API Gateway locally with [AWS SAM (Serverless Applicat
 
 ### prerequisites
 
-* Install [aws-sam-cli](https://github.com/awslabs/aws-sam-cli). Docker is also required. Follow the instruction [here](https://github.com/awslabs/aws-sam-cli#installation).
-* Set environmental variables to [sample-env.json](sample-env.json).
+* install [aws-sam-cli](https://github.com/awslabs/aws-sam-cli). Docker is also required. Follow the instruction [here](https://github.com/awslabs/aws-sam-cli#installation).
+* set environment variables to [sample-env.json](sample-env.json).
   * You have to go to the [Twitter Apps page](https://apps.twitter.com/) and create new app by yourself. Then you can get *Access Token*, *Access Token Secret*, *Consumer Key (API Key)* and *Consumer Secret (API Secret)*.
   * *REPO* is your repository name on the GitHub. For example, if you want to notice the latest release on [this repository](https://github.com/toshi0607/gig) to your followers, you have to set **toshi0607/gig** to *REPO*.
 
