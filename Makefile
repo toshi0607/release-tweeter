@@ -31,10 +31,12 @@ errcheck:
 	fi
 	echo $(PACKAGES) | xargs errcheck -ignoretests
 
+release: setup bump build deploy
+
 bump: setup
 	./scripts/bumpup.sh
 
-deploy: bump
+deploy: build
 	./scripts/deploy.sh
 
 upload: bump
@@ -46,4 +48,4 @@ build:
 local: build
 	sam local start-api --env-vars env.json
 
-.PHONY: test-all test vet lint setup bump upload
+.PHONY: test-all test vet lint setup bump upload build deploy release local
