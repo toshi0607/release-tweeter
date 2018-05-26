@@ -40,4 +40,4 @@ deploy: bump
 upload: bump
 	./scripts/upload.sh
 
-.PHONY: test-all test vet lint setup bump
+.PHONY: test-all test vet lint setup bump upload
