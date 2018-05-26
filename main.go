@@ -10,7 +10,6 @@ import (
 	a "github.com/ChimeraCoder/anaconda"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/pkg/errors"
 )
 
 var (
@@ -47,59 +46,63 @@ func main() {
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	if request.HTTPMethod != "POST" {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusBadRequest,
-		}, errors.New("use POST request")
+		return response(
+			http.StatusBadRequest,
+			"use POST request",
+		), nil
 	}
 
 	if hasEmptyEnvVar() {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusInternalServerError,
-		}, errors.New("Env Vars not set")
+		return response(
+			http.StatusInternalServerError,
+			"env vars not set",
+		), nil
 	}
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", latestURL, nil)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusInternalServerError,
-		}, err
+		return response(
+			http.StatusInternalServerError,
+			err.Error(),
+		), nil
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusInternalServerError,
-		}, err
+		return response(
+			http.StatusInternalServerError,
+			err.Error(),
+		), nil
 	}
 	defer resp.Body.Close()
 
 	tag, err := getLatestTag(resp.Request.URL.Path)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusNotFound,
-		}, err
+		return response(
+			http.StatusNotFound,
+			err.Error(),
+		), nil
 	}
 	log.Printf("tag: %s, ID: %s\n", tag, request.RequestContext.RequestID)
 
 	message := fmt.Sprintf("%s %s released! check the new features on GitHub.\n%s", repo, tag, repoURL)
 	msg, err := twitterClient.tweet(message)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusInternalServerError,
-		}, err
+		return response(
+			http.StatusInternalServerError,
+			err.Error(),
+		), nil
 	}
 	if !strings.Contains(msg, tag) {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusInternalServerError,
-		}, errors.New("failed to tweet: " + msg)
+		return response(
+			http.StatusInternalServerError,
+			fmt.Sprintf("failed to tweet: %s", msg),
+		), nil
 	}
 	log.Printf("message tweeted: %s, ID: %s\n", msg, request.RequestContext.RequestID)
 
-	return events.APIGatewayProxyResponse{
-		Body:       tag,
-		StatusCode: http.StatusOK,
-	}, nil
+	return response(http.StatusOK, tag), nil
 }
 
 func hasEmptyEnvVar() bool {
@@ -113,7 +116,15 @@ func hasEmptyEnvVar() bool {
 func getLatestTag(url string) (string, error) {
 	s := strings.Split(url, "/")
 	if !strings.Contains(url, "v") {
-		return "", errors.Errorf("%s has no tag", repo)
+		return "", fmt.Errorf("%s has no tag", repo)
 	}
 	return s[len(s)-1], nil
+}
+
+func response(code int, msg string) events.APIGatewayProxyResponse {
+	return events.APIGatewayProxyResponse{
+		StatusCode: code,
+		Body:       fmt.Sprintf("{\"message\":\"%s\"}", msg),
+		Headers:    map[string]string{"Content-Type": "application/json"},
+	}
 }
