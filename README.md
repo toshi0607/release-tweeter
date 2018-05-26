@@ -1,6 +1,11 @@
 release-tweeter
 ====
 
+[![Build Status](https://travis-ci.org/toshi0607/release-tweeter.svg?branch=master)](https://travis-ci.org/toshi0607/release-tweeter)
+[![Go Report Card](https://goreportcard.com/badge/github.com/toshi0607/release-tweeter)](https://goreportcard.com/report/github.com/toshi0607/release-tweeter)
+[![MIT License](http://img.shields.io/badge/license-MIT-lightgrey.svg)](https://github.com/toshi0607/release-tweeter/blob/master/LICENSE)
+[![Codecov](https://codecov.io/github/toshi0607/release-tweeter/coverage.svg?branch=master)](https://codecov.io/github/toshi0607/release-tweeter?branch=master)
+
 ## Description
 API to tweet the latest release tag version using AWS Lambda(Golang) & API Gateway.
 
