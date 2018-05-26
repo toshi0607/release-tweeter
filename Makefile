@@ -40,4 +40,10 @@ deploy: bump
 upload: bump
 	./scripts/upload.sh
 
+build:
+	GOOS=linux GOARCH=amd64 go build -o main
+
+local: build
+	sam local start-api --env-vars env.json
+
 .PHONY: test-all test vet lint setup bump upload
