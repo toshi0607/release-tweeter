@@ -19,7 +19,7 @@ coverage.txt
 # aws
 credentials.csv
 env.json
-packaged.yaml
+packaged.yml
 
 # dep
 vendor/
