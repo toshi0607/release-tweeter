@@ -37,4 +37,7 @@ bump: setup
 deploy: bump
 	./scripts/deploy.sh
 
+upload: bump
+	./scripts/upload.sh
+
 .PHONY: test-all test vet lint setup bump
