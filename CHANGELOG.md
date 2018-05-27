@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.3.0](https://github.com/toshi0607/release-tweeter/compare/v0.2.0...v0.3.0) (2018-05-27)
+
+* :green_heart: tweet [#16](https://github.com/toshi0607/release-tweeter/pull/16) ([toshi0607](https://github.com/toshi0607))
+* use request body to specify repo [#15](https://github.com/toshi0607/release-tweeter/pull/15) ([toshi0607](https://github.com/toshi0607))
+* Features/upload [#13](https://github.com/toshi0607/release-tweeter/pull/13) ([toshi0607](https://github.com/toshi0607))
+
 ## [v0.2.0](https://github.com/toshi0607/release-tweeter/compare/b732846ca5d0...v0.2.0) (2018-05-26)
 
 * :memo: add badges [#12](https://github.com/toshi0607/release-tweeter/pull/12) ([toshi0607](https://github.com/toshi0607))
