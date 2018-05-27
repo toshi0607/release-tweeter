@@ -23,3 +23,6 @@ packaged.yml
 
 # dep
 vendor/
+
+# env
+.envrc

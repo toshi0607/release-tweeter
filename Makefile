@@ -31,13 +31,24 @@ errcheck:
 	fi
 	echo $(PACKAGES) | xargs errcheck -ignoretests
 
+release: setup bump build deploy
+
 bump: setup
 	./scripts/bumpup.sh
 
-deploy: bump
+deploy: build
 	./scripts/deploy.sh
 
 upload: bump
 	./scripts/upload.sh
 
-.PHONY: test-all test vet lint setup bump upload
+build:
+	GOOS=linux GOARCH=amd64 go build -o main
+
+local: build
+	sam local start-api --env-vars env.json
+
+post:
+	curl -X POST -d '{"owner": "toshi0607", "repo": "gig"}' http://127.0.0.1:3000/
+
+.PHONY: test-all test vet lint setup bump upload build deploy release local

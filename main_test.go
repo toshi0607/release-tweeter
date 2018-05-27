@@ -12,6 +12,7 @@ func TestHandler(t *testing.T) {
 
 	res, err := handler(events.APIGatewayProxyRequest{
 		HTTPMethod: "POST",
+		Body:       "{\"owner\": \"toshi0607\", \"repo\": \"gig\"}",
 	})
 
 	if err != nil {
