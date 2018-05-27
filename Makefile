@@ -1,4 +1,5 @@
 PACKAGES = $(shell ./scripts/packages.sh)
+APIGW_LOCAL_ENDPOINT = http://127.0.0.1:3000/
 
 EXTERNAL_TOOLS = \
 	github.com/golang/dep/cmd/dep \
@@ -31,7 +32,7 @@ errcheck:
 	fi
 	echo $(PACKAGES) | xargs errcheck -ignoretests
 
-release: setup bump build deploy
+release: setup bump build upload deploy tweet
 
 bump: setup
 	./scripts/bumpup.sh
@@ -45,10 +46,13 @@ upload: bump
 build:
 	GOOS=linux GOARCH=amd64 go build -o main
 
+tweet:
+	./scripts/tweet.sh
+
 local: build
 	sam local start-api --env-vars env.json
 
 post:
-	curl -X POST -d '{"owner": "toshi0607", "repo": "gig"}' http://127.0.0.1:3000/
+	curl -X POST -d '{"owner": "toshi0607", "repo": "gig"}' $(APIGW_LOCAL_ENDPOINT)
 
-.PHONY: test-all test vet lint setup bump upload build deploy release local
+.PHONY: test-all test vet lint setup bump upload build deploy release local tweet
