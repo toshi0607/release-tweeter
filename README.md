@@ -130,8 +130,8 @@ $ aws s3 mb s3://lambda-release-tweeter --profile private
 ```
 
 * an S3 bucket is required. so make a bucket for the release-tweeter you're going to host for the first time
-* AWS management console is also avilable to make a bucket instead of the AWS Cli
-* a buekcet name (`lambda-release-tweeter` in this case) should be unique globally.
+* AWS management console is also available to make a bucket instead of the AWS Cli
+* a bucket name (`lambda-release-tweeter` in this case) should be unique globally.
 
 2. prepare artifacts for deploy
 
@@ -159,6 +159,6 @@ $ sam deploy --profile private \
     TWITTER_CONSUMER_SECRET=$TWITTER_CONSUMER_SECRET
 ```
 
-* *--parameter-overrides* option is requred because we shouldn't write qredentials to the *template.yml*.
-* you have to set 5 environment variables in this case. you can pass value of *TWITTER_ACCESS_TOKEN*, *TWITTER_ACCESS_TOKEN_SECRET*, *TWITTER_CONSUMER_KEY* and *TWITTER_CONSUMER_SECRET* directly instead.
+* *--parameter-overrides* option is required because we shouldn't write credentials to the *template.yml*.
+* you have to set 4 environment variables in this case. you can pass value of *TWITTER_ACCESS_TOKEN*, *TWITTER_ACCESS_TOKEN_SECRET*, *TWITTER_CONSUMER_KEY* and *TWITTER_CONSUMER_SECRET* directly instead.
 * a stack name (`stack-release-tweeter` in this case) should be unique globally.
