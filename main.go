@@ -8,37 +8,37 @@ import (
 	"os"
 	"strings"
 
-	a "github.com/ChimeraCoder/anaconda"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/pkg/errors"
+	"github.com/toshi0607/release-tweeter/twitter"
 )
 
-var (
-	twitterAccessToken               = os.Getenv("TWITTER_ACCESS_TOKEN")
-	twitterAccessTokenSecret         = os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
-	twitterConsumerKey               = os.Getenv("TWITTER_CONSUMER_KEY")
-	twitterConsumerKeySecret         = os.Getenv("TWITTER_CONSUMER_SECRET")
-	twitterClient            tweeter = api(*a.NewTwitterApiWithCredentials(
+// Tweeter is interface to tweet a message
+type tweeter interface {
+	Tweet(message string) (string, error)
+}
+
+var twitterClient tweeter
+
+func init() {
+	twitterAccessToken := os.Getenv("TWITTER_ACCESS_TOKEN")
+	twitterAccessTokenSecret := os.Getenv("TWITTER_ACCESS_TOKEN_SECRET")
+	twitterConsumerKey := os.Getenv("TWITTER_CONSUMER_KEY")
+	twitterConsumerKeySecret := os.Getenv("TWITTER_CONSUMER_SECRET")
+	tc, err := twitter.NewClient(
 		twitterAccessToken,
 		twitterAccessTokenSecret,
 		twitterConsumerKey,
 		twitterConsumerKeySecret,
-	))
-)
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	twitterClient = tc
+}
 
 const gitHubBaseURL = "https://github.com/"
-
-type tweeter interface {
-	tweet(message string) (string, error)
-}
-
-type api a.TwitterApi
-
-func (api api) tweet(message string) (string, error) {
-	tweet, err := (a.TwitterApi(api)).PostTweet(message, nil)
-	return tweet.Text, err
-}
 
 type params struct {
 	Owner string `json:"owner"`
@@ -84,13 +84,6 @@ func main() {
 }
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	if hasEmptyEnvVar() {
-		return response(
-			http.StatusInternalServerError,
-			"env vars not set",
-		), nil
-	}
-
 	p, err := parseRequest(request)
 	if err != nil {
 		return response(
@@ -110,7 +103,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	log.Printf("tag: %s, ID: %s\n", tag, request.RequestContext.RequestID)
 
 	message := fmt.Sprintf("%s %s released! check the new features on GitHub.\n%s", c.fullRepo, tag, c.repoURL)
-	msg, err := twitterClient.tweet(message)
+	msg, err := twitterClient.Tweet(message)
 	if err != nil {
 		return response(
 			http.StatusInternalServerError,
@@ -139,12 +132,6 @@ func parseRequest(r events.APIGatewayProxyRequest) (*params, error) {
 		return nil, errors.Wrapf(err, "failed to parse params")
 	}
 	return &p, nil
-}
-func hasEmptyEnvVar() bool {
-	return twitterAccessToken == "" ||
-		twitterAccessTokenSecret == "" ||
-		twitterConsumerKey == "" ||
-		twitterConsumerKeySecret == ""
 }
 
 func getLatestTag(url string) (string, error) {
