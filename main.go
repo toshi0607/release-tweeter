@@ -14,7 +14,12 @@ import (
 	"github.com/toshi0607/release-tweeter/twitter"
 )
 
-var twitterClient twitter.Tweeter
+// Tweeter is interface to tweet a message
+type tweeter interface {
+	Tweet(message string) (string, error)
+}
+
+var twitterClient tweeter
 
 func init() {
 	twitterAccessToken := os.Getenv("TWITTER_ACCESS_TOKEN")

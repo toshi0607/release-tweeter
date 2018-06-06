@@ -6,11 +6,6 @@ import (
 	a "github.com/ChimeraCoder/anaconda"
 )
 
-// Tweeter is interface to tweet a message
-type Tweeter interface {
-	Tweet(message string) (string, error)
-}
-
 // Client represents twitter client
 type Client struct {
 	*a.TwitterApi
