@@ -30,6 +30,6 @@ func prepare() {
 
 type mockClient string
 
-func (m mockClient) tweet(s string) (string, error) {
+func (m mockClient) Tweet(s string) (string, error) {
 	return s, nil
 }
