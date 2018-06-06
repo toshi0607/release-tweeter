@@ -28,7 +28,7 @@ func NewClient(twitterAccessToken, twitterAccessTokenSecret, twitterConsumerKey,
 		twitterAccessTokenSecret == "" ||
 		twitterConsumerKey == "" ||
 		twitterConsumerKeySecret == "" {
-		return nil, errors.New("twitter: all of the credential is required")
+		return nil, errors.New("twitter: all of the credentials are required")
 	}
 
 	return &Client{a.NewTwitterApiWithCredentials(
