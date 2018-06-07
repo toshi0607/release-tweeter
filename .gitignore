@@ -26,3 +26,6 @@ vendor/
 
 # env
 .envrc
+
+# sample
+sample*

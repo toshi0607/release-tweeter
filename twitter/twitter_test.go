@@ -7,12 +7,8 @@ func TestNewClient(t *testing.T) {
 		a1, a2, a3, a4 string
 		wantError      bool
 	}{
-		{
-			"test", "test", "test", "test", false,
-		},
-		{
-			"", "", "", "", true,
-		},
+		{"test", "test", "test", "test", false},
+		{"", "", "", "", true},
 	}
 
 	for _, te := range tests {
