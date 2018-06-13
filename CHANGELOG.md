@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.4.0](https://github.com/toshi0607/release-tweeter/compare/v0.3.0...v0.4.0) (2018-06-12)
+
+* :up: 1.10.3 [#24](https://github.com/toshi0607/release-tweeter/pull/24) ([toshi0607](https://github.com/toshi0607))
+* :recycle: decouple GitHub Client [#23](https://github.com/toshi0607/release-tweeter/pull/23) ([toshi0607](https://github.com/toshi0607))
+* :recycle: decouple twitter [#21](https://github.com/toshi0607/release-tweeter/pull/21) ([toshi0607](https://github.com/toshi0607))
+* :memo: typo [#17](https://github.com/toshi0607/release-tweeter/pull/17) ([toshi0607](https://github.com/toshi0607))
+
 ## [v0.3.0](https://github.com/toshi0607/release-tweeter/compare/v0.2.0...v0.3.0) (2018-05-27)
 
 * :green_heart: tweet [#16](https://github.com/toshi0607/release-tweeter/pull/16) ([toshi0607](https://github.com/toshi0607))
