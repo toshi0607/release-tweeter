@@ -162,3 +162,20 @@ $ sam deploy --profile private \
 * *--parameter-overrides* option is required because we shouldn't write credentials to the *template.yml*.
 * you have to set 4 environment variables in this case. you can pass value of *TWITTER_ACCESS_TOKEN*, *TWITTER_ACCESS_TOKEN_SECRET*, *TWITTER_CONSUMER_KEY* and *TWITTER_CONSUMER_SECRET* directly instead.
 * a stack name (`stack-release-tweeter` in this case) should be unique globally.
+
+## Tips
+A [direnv](https://github.com/direnv/direnv) is useful to manage project specific env vars.
+In a release-tweeter, you have to use twitter secrets. You might want to use different secrets in each projects.
+A direnv is a solution for this problem.
+Setting up a direnv and put a dotfile like this on the project root,
+
+.envrc
+```
+export TWITTER_ACCESS_TOKEN=xxx
+export TWITTER_ACCESS_TOKEN_SECRET=yyy
+export TWITTER_CONSUMER_KEY=zzz
+export TWITTER_CONSUMER_SECRET=xyz
+export RELEASE_TWEETER_ENDPOINT=https://xxxxxx.execute-api.ap-northeast-1.amazonaws.com/Prod
+```
+
+these env vars will be exported when you move to your gig project.
